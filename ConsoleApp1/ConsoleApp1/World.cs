@@ -9,10 +9,10 @@ namespace ConsoleApp1
 {
     public class World
     {
-        readonly Random Random = new Random();
+        static Random Random = new Random();
         public const int vertical = 8;
         public const int horizontal = 8;
-        public static int width = 110;
+        public static int width = 111;
         public static Cell[,] Grid { get; set; } = new Cell[vertical, horizontal];
         private float[] Propors { get; set; } = new float[3] { 0.2F, 0.3F, 0.5F };
         int[] Nums { get; set; } = new int[3] { 0, 1, 2 };
@@ -25,7 +25,7 @@ namespace ConsoleApp1
             List<int> list = new List<int>();
             for (int i = Nums.Length - 1; i >= 0; i--)
             {
-                for (int j = (int)(Grid.Length * Propors[i]); j > 0 & k > 1; j--)
+                for (int j = (int)(Grid.Length * Propors[i]) + 3; j > 0 & k > 0; j--)
                 {
                     k -= 1;
                     list.Add(i);
@@ -38,14 +38,30 @@ namespace ConsoleApp1
                     {
                         for (int j = Grid.GetUpperBound(1); j >= 0; j--)
                         {
-                            if (i == 0 & j == 0)
+                            switch (i)
                             {
-                                Grid[i, j] = new Cell(-1);
-                                continue;
+                                case 0 when j == 0:
+                                    Grid[i, j] = new Cell(-2);
+                                    break;
+                                case 0 when j == 1:
+                                    Grid[i, j] = new Cell(2);
+                                    Grid[i, j].emhp = 88;
+                                    Grid[i, j].ehp = Grid[i, j].emhp;
+                                    break;
+                                case 1 when j == 0:
+                                    Grid[i, j] = new Cell(2);
+                                    Grid[i, j].emhp = 88;
+                                    Grid[i, j].ehp = Grid[i, j].emhp;
+                                    break;
+                                case vertical - 1 when j == horizontal - 1:
+                                    Grid[i, j] = new Cell(3);
+                                    break;
+                                default:
+                                    rng = Random.Next(list.Count);
+                                    Grid[i, j] = new Cell(list[rng]);
+                                    list.RemoveAt(rng);
+                                    break;
                             }
-                            rng = Random.Next(list.Count);
-                            Grid[i, j] = new Cell(list[rng]);
-                            list.RemoveAt(rng);
                         }
                     }
                     break;

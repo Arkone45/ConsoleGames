@@ -8,7 +8,7 @@ namespace ConsoleApp1
 {
     public class Cell
     {
-        static readonly Random Random = new Random();
+        static Random Random = new Random();
         public string name = "";
         public int its_state = 0;
         public int emhp = 0;
@@ -24,7 +24,7 @@ namespace ConsoleApp1
                 case 2:
                     name = "Enemy";
                     its_state = 2; // battle
-                    emhp = Random.Next(40, 151);
+                    emhp = emhp == 0 ? Random.Next(40, 151) : emhp;
                     ehp = emhp;
                     if (emhp >= 130)
                     {
@@ -45,10 +45,15 @@ namespace ConsoleApp1
                     break;
                 case 0:
                     name = "Event";
-                    its_state = 0; //diologue
+                    its_state = -1; //diologue
                     break;
                 case -2:
                     name = "Beginning";
+                    its_state = -1; // traveling
+                    break;
+                case 3:
+                    name = "Boss";
+                    its_state = 2; // battle
                     break;
             }
         }
@@ -88,6 +93,8 @@ namespace ConsoleApp1
                         default:
                             return (f == 0) ? (object)'\uFB13' : ConsoleColor.Blue;
                     }
+                case "Boss":
+                    return (f == 0) ? (object)name[0] : ConsoleColor.Black;
                 default:
                     return (f == 0) ? (object)'\uFB13' : ConsoleColor.Blue;
             }

@@ -20,9 +20,9 @@ namespace ConsoleApp1
             switch (State)
             {
                 case -1: // traveling
-                    Printer("Choose direction (r/right, d/down): ", 0);
                     while (true)
                     {
+                        Printer("Choose direction (r/right, d/down): ", 0, (ConsoleColor)7);
                         HUD(State);
                         input = Convert.ToChar(Console.ReadLine());
                         if (input == 'r' | input == 'd')
@@ -31,7 +31,32 @@ namespace ConsoleApp1
                         }
                         else
                         {
-                            Printer("Unknown command", 1);
+                            Printer("Unknown command", 1, (ConsoleColor)7);
+                        }
+                    }
+                case 0: // diologue
+                    input = Convert.ToChar(Console.ReadLine());
+                    return input;
+                case 1: // trading
+                    while (true)
+                    {
+                        if (entered)
+                        {
+                            Printer("You have came across a person who wants to exchange some of his items for", 0, (ConsoleColor)7);
+                            Printer(" gold", 0, (ConsoleColor)14);
+                            Printer(".", 1, (ConsoleColor)7);
+                            entered = false;
+                        }
+                        Printer("Choose next action (1..5/purchae an item, l/leave): ", 0, (ConsoleColor)7);
+                        HUD(State);
+                        input = Convert.ToChar(Console.ReadLine());
+                        if (input == '1' | input == '2' | input == '3' | input == '4' | input == '5' | input == 'l')
+                        {
+                            return input;
+                        }
+                        else
+                        {
+                            Printer("Unknown command", 1, (ConsoleColor)7);
                         }
                     }
 
@@ -41,14 +66,14 @@ namespace ConsoleApp1
                         Console.WriteLine("You have stumbled upon an unfriendly " + World.Grid[y, x].dificulty + " looking creature...");
                         entered = false;
                     }
-                    Printer("It's preparing to attack(" + ")!", 1);
+                    Printer("It's preparing to attack(" + ")!", 1, (ConsoleColor)7);
                     if (escapability)
                     {
-                        Printer("Choose next action (a/attack(20), b/block(15), e/escape(40)): ", 0);
+                        Printer("Choose next action (a/attack(20), b/block(15), e/escape(40)): ", 0, (ConsoleColor)7);
                     }
                     else
                     {
-                        Printer("Choose next action (a/attack(20), b/block(15)): ", 0);
+                        Printer("Choose next action (a/attack(20), b/block(15)): ", 0, (ConsoleColor)7);
                     }
                     while (true)
                     {
@@ -60,22 +85,27 @@ namespace ConsoleApp1
                         }
                         else
                         {
-                            Printer("Unknown command", 1);
+                            Printer("Unknown command", 1, (ConsoleColor)7);
                         }
                     }
-                case 0:
-
-                    return input;
                 default:
-                    return Convert.ToChar(Console.ReadLine());
+                    input = Convert.ToChar(Console.ReadLine());
+                    return input;
             }
         }
-        void Printer(string output, int enter)
+        void Spaces(int indent)
         {
+            for (int j = 0; j < World.width - (World.horizontal * 2) - (indent + 4); j++)
+            {
+                Console.Write(" ");
+            }
+        }
+        void Printer(string output, int enter, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
             if (enter == 1)
             {
                 Console.WriteLine(output);
-
             }
             else
             {
@@ -115,31 +145,22 @@ namespace ConsoleApp1
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.Write("HP: " + Player.HP + "/" + Player.MHP);
                         Console.ResetColor();
-                        int del = Convert.ToString(Player.HP).Length + Convert.ToString(Player.MHP).Length + 6;
-                        for (int j = 0; j < World.width - (World.horizontal * 2 + 3) - del; j++)
-                        {
-                            Console.Write(" ");
-                        }
+                        int indent = ("HP: " + Player.HP + "/" + Player.MHP).Length;
+                        Spaces(indent);
                         break;
                     case 1:
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write("AP: " + Player.AP + "/" + Player.MAP);
                         Console.ResetColor();
-                        del = Convert.ToString(Player.AP).Length + Convert.ToString(Player.MAP).Length + 6;
-                        for (int l = 0; l < World.width - (World.horizontal * 2 + 3) - del; l++)
-                        {
-                            Console.Write(" ");
-                        }
+                        indent = ("AP: " + Player.AP + "/" + Player.MAP).Length;
+                        Spaces(indent);
                         break;
                     case 2:
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write("Gold: " + Player.gold);
                         Console.ResetColor();
-                        del = Convert.ToString(Player.gold).Length + 7;
-                        for (int l = 0; l < World.width - (World.horizontal * 2 + 3) - del; l++)
-                        {
-                            Console.Write(" ");
-                        }
+                        indent = ("Gold: " + Player.gold).Length;
+                        Spaces(indent);
                         break;
                     case World.vertical - 1:
                         if (State == 2)
@@ -147,18 +168,12 @@ namespace ConsoleApp1
                             Console.ForegroundColor = ConsoleColor.Magenta;
                             Console.Write("It's HP: " + Convert.ToString(World.Grid[Player.Y, Player.X].ehp) + "/" + Convert.ToString(World.Grid[Player.Y, Player.X].emhp));
                             Console.ResetColor();
-                            del = 10 + Convert.ToString(World.Grid[Player.Y, Player.X].ehp).Length + Convert.ToString(World.Grid[Player.Y, Player.X].emhp).Length;
-                            for (int l = 0; l < World.width - (World.horizontal * 2 + 4) - del; l++)
-                            {
-                                Console.Write(" ");
-                            }
+                            indent = ("It's HP: " + Convert.ToString(World.Grid[Player.Y, Player.X].ehp) + "/" + Convert.ToString(World.Grid[Player.Y, Player.X].emhp)).Length;
+                            Spaces(indent);
                         }
                         else
                         {
-                            for (int l = 0; l < World.width - (World.horizontal * 2 + 4); l++)
-                            {
-                                Console.Write(" ");
-                            }
+                            Spaces(0);
                         }
                         break;
                     default:
@@ -170,23 +185,28 @@ namespace ConsoleApp1
                 }
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.BackgroundColor = ConsoleColor.DarkGreen;
-                Console.Write("\u2503");
+                Console.Write("\u2503 ");
                 for (int j = 0; j < World.Grid.GetUpperBound(1) + 1; j++)
                 {
                     if (Player.Y == i & Player.X == j)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.Write(" *");
+                        Console.Write("* ");
+                    }
+                    else if (World.Grid[i, j].side % 10 == 2)
+                    {
+                        Console.ForegroundColor = (ConsoleColor)World.Grid[i, j].Sname(1);
+                        Console.Write(World.Grid[i, j].Sname(0) + "\u2500");
                     }
                     else
                     {
                         Console.ForegroundColor = (ConsoleColor)World.Grid[i, j].Sname(1);
-                        Console.Write(" " + World.Grid[i, j].Sname(0));
+                        Console.Write(World.Grid[i, j].Sname(0) + " ");
                     }
 
                 }
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(" \u2503");
+                Console.Write("\u2503");
                 Console.ResetColor();
                 Console.WriteLine();
             }
