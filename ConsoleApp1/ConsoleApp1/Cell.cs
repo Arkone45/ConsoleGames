@@ -1,15 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
+    public enum CellStates
+    {
+        Beginning,
+        Event,
+        Enemy,
+        Shop,
+        Boss = -1,
+        Clear
+    }
     public class Cell
     {
-        static Random Random = new Random();
-        public string name = "";
+        public CellStates name;
         public int its_state = 0;
         public int emhp = 0;
         public int ehp = 0;
@@ -17,44 +27,23 @@ namespace ConsoleApp1
         public string dificulty = "";
         public int reward = 0;
         public int side = 0;
-        public Cell(int type)
+        public List <string> asortment = new List<string>();
+        public Cell CellIdentifier(int type)
         {
             switch (type)
             {
                 case 2:
-                    name = "Enemy";
-                    its_state = 2; // battle
-                    emhp = emhp == 0 ? Random.Next(40, 151) : emhp;
-                    ehp = emhp;
-                    if (emhp >= 130)
-                    {
-                        dificulty = "and powerful";
-                    }
-                    else if (emhp >= 100)
-                    {
-                        dificulty = "";
-                    }
-                    else
-                    {
-                        dificulty = "and weak";
-                    }
-                    break;
-                case 1:
-                    name = "Shop";
-                    its_state = 1; // trading
-                    break;
+                    return new EnemyCell();
                 case 0:
-                    name = "Event";
-                    its_state = -1; //diologue
-                    break;
-                case -2:
-                    name = "Beginning";
-                    its_state = -1; // traveling
-                    break;
+                    return new ShopCell();
+                case 1:
+                    return new EventCell();
                 case 3:
-                    name = "Boss";
-                    its_state = 2; // battle
-                    break;
+                    return new BeginningCell();
+                case 4:
+                    return new BossCell();
+                default:
+                    return new Cell();
             }
         }
         public object Sname(int f)
@@ -62,24 +51,24 @@ namespace ConsoleApp1
             object[] aray = new object[2];
             switch (name)
             {
-                case "Enemy":
+                case CellStates.Enemy:
                     if (emhp >= 130)
                     {
-                        return (f == 0) ? (object)name[0] : ConsoleColor.Red;
+                        return (f == 0) ? (object)Convert.ToString(name)[0] : ConsoleColor.Red;
                     }
                     else if (emhp >= 100)
                     {
-                        return (f == 0) ? (object)name[0] : ConsoleColor.Gray;
+                        return (f == 0) ? (object)Convert.ToString(name)[0] : ConsoleColor.Gray;
                     }
                     else
                     {
-                        return (f == 0) ? (object)char.ToLower(name[0]) : ConsoleColor.Gray;
+                        return (f == 0) ? (object)char.ToLower(Convert.ToString(name)[0]) : ConsoleColor.Gray;
                     }
-                case "Event":
-                    return (f == 0) ? (object)name[1] : ConsoleColor.Gray;
-                case "Shop":
+                case CellStates.Event:
+                    return (f == 0) ? (object)Convert.ToString(name)[1] : ConsoleColor.Gray;
+                case CellStates.Shop:
                     return (f == 0) ? (object)'$' : ConsoleColor.Gray;
-                case "Clear":
+                case CellStates.Clear:
                     switch (side)
                     {
                         case 11:
@@ -93,8 +82,8 @@ namespace ConsoleApp1
                         default:
                             return (f == 0) ? (object)'\uFB13' : ConsoleColor.Blue;
                     }
-                case "Boss":
-                    return (f == 0) ? (object)name[0] : ConsoleColor.Black;
+                case CellStates.Boss:
+                    return (f == 0) ? (object)Convert.ToString(name)[0] : ConsoleColor.Black;
                 default:
                     return (f == 0) ? (object)'\uFB13' : ConsoleColor.Blue;
             }

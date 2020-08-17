@@ -10,6 +10,7 @@ namespace ConsoleApp1
     public class World
     {
         static Random Random = new Random();
+        Cell cell = new Cell();
         public const int vertical = 8;
         public const int horizontal = 8;
         public static int width = 111;
@@ -41,24 +42,24 @@ namespace ConsoleApp1
                             switch (i)
                             {
                                 case 0 when j == 0:
-                                    Grid[i, j] = new Cell(-2);
+                                    Grid[i, j] = cell.CellIdentifier(0);
                                     break;
                                 case 0 when j == 1:
-                                    Grid[i, j] = new Cell(2);
+                                    Grid[i, j] = cell.CellIdentifier(2);
                                     Grid[i, j].emhp = 88;
                                     Grid[i, j].ehp = Grid[i, j].emhp;
                                     break;
                                 case 1 when j == 0:
-                                    Grid[i, j] = new Cell(2);
+                                    Grid[i, j] = cell.CellIdentifier(2);
                                     Grid[i, j].emhp = 88;
                                     Grid[i, j].ehp = Grid[i, j].emhp;
                                     break;
                                 case vertical - 1 when j == horizontal - 1:
-                                    Grid[i, j] = new Cell(3);
+                                    Grid[i, j] = cell.CellIdentifier(4);
                                     break;
                                 default:
                                     rng = Random.Next(list.Count);
-                                    Grid[i, j] = new Cell(list[rng]);
+                                    Grid[i, j] = cell.CellIdentifier(list[rng]);
                                     list.RemoveAt(rng);
                                     break;
                             }
@@ -79,8 +80,8 @@ namespace ConsoleApp1
                 Grid[Y, X].side += 20;
                 Grid[_Y, _X].side += 2;
             }
-            Grid[_Y, _X].name = "Clear";
-            Grid[_Y, _X].its_state = -3;
+            Grid[_Y, _X].name = CellStates.Clear;
+            Grid[_Y, _X].its_state = (int)CellStates.Clear;
             _Y = Y;
             _X = X;
             return Grid[Y, X].its_state;

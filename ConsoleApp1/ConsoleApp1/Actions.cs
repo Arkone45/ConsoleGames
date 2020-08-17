@@ -8,6 +8,7 @@ namespace ConsoleApp1
 {
     class Actions
     {
+        Random random = new Random();
         char input = ' ';
         int eatk = 0;
         public bool escapability = true;
@@ -19,10 +20,10 @@ namespace ConsoleApp1
         {
             switch (State)
             {
-                case -1: // traveling
+                case (int)States.Traveling:
                     while (true)
                     {
-                        Printer("Choose direction (r/right, d/down): ", 0, (ConsoleColor)7);
+                        Print("Choose direction (r/right, d/down): ", 0, (ConsoleColor)7);
                         HUD(State);
                         input = Convert.ToChar(Console.ReadLine());
                         if (input == 'r' | input == 'd')
@@ -31,49 +32,80 @@ namespace ConsoleApp1
                         }
                         else
                         {
-                            Printer("Unknown command", 1, (ConsoleColor)7);
+                            Print("Unknown command", 1, (ConsoleColor)7);
                         }
                     }
-                case 0: // diologue
-                    input = Convert.ToChar(Console.ReadLine());
-                    return input;
-                case 1: // trading
+                case (int)States.Trading:
                     while (true)
                     {
                         if (entered)
                         {
-                            Printer("You have came across a person who wants to exchange some of his items for", 0, (ConsoleColor)7);
-                            Printer(" gold", 0, (ConsoleColor)14);
-                            Printer(".", 1, (ConsoleColor)7);
+                            Print("You have came across a person who wants to exchange some of his items for", 0, (ConsoleColor)7);
+                            Print(" gold", 0, (ConsoleColor)14);
+                            Print(".", 1, (ConsoleColor)7);
                             entered = false;
                         }
-                        Printer("Choose next action (1..5/purchae an item, l/leave): ", 0, (ConsoleColor)7);
+                        Print("In stock: ", 0, (ConsoleColor)7);
+                        for (int i = 0; i < World.Grid[y, x].asortment.Count; i++)
+                        {
+                            if (i == World.Grid[y, x].asortment.Count - 1)
+                            {
+                                Print( "(" + World.Grid[y, x].asortment[i] + ") ", 1, (ConsoleColor)7);
+                            }
+                            else
+                            {
+                                Print("(" + World.Grid[y, x].asortment[i] + ") ", 0, (ConsoleColor)7);
+                            }
+
+                        }
+                        Print("Choose next action (1..3/purchae an item, l/leave): ", 0, (ConsoleColor)7);
                         HUD(State);
                         input = Convert.ToChar(Console.ReadLine());
-                        if (input == '1' | input == '2' | input == '3' | input == '4' | input == '5' | input == 'l')
+                        if (input == '1' | input == '2' | input == '3' | input == 'l')
                         {
                             return input;
                         }
                         else
                         {
-                            Printer("Unknown command", 1, (ConsoleColor)7);
+                            Print("Unknown command", 1, (ConsoleColor)7);
                         }
                     }
-
-                case 2: // battle
+                case (int)States.Battle:
                     if (entered)
                     {
-                        Console.WriteLine("You have stumbled upon an unfriendly " + World.Grid[y, x].dificulty + " looking creature...");
+                        Print("You have stumbled upon an unfriendly " + World.Grid[y, x].dificulty + " looking ", 0, (ConsoleColor)7);
+                        Print("creature...", 1, (ConsoleColor)13);
                         entered = false;
                     }
-                    Printer("It's preparing to attack(" + ")!", 1, (ConsoleColor)7);
-                    if (escapability)
+                    Print("It's", 0, (ConsoleColor)13);
+                    eatk = random.Next(20, World.Grid[y, x].emhp / 2);
+                    if (eatk < 40)
                     {
-                        Printer("Choose next action (a/attack(20), b/block(15), e/escape(40)): ", 0, (ConsoleColor)7);
+                        Print(" preparing a light attack(", 0, (ConsoleColor)7);
+                    }
+                    else if (eatk < 60)
+                    {
+                        Print(" preparing a medium attack(", 0, (ConsoleColor)7);
                     }
                     else
                     {
-                        Printer("Choose next action (a/attack(20), b/block(15)): ", 0, (ConsoleColor)7);
+                        Print(" preparing a heavy attack(", 0, (ConsoleColor)7);
+                    }
+                    Print(Convert.ToString(eatk), 0, (ConsoleColor)12);
+                    Print(")!", 1, (ConsoleColor)7);
+                    if (escapability)
+                    {
+                        Print("Choose next action (a/attack(", 0, (ConsoleColor)7);
+                        Print("20", 0, (ConsoleColor)11);
+                        Print("), b/block(", 0, (ConsoleColor)7);
+                        Print("15", 0, (ConsoleColor)11);
+                        Print("), e/escape(", 0, (ConsoleColor)7);
+                        Print("40", 0, (ConsoleColor)11);
+                        Print(")): ", 0, (ConsoleColor)7);
+                    }
+                    else
+                    {
+                        Print("Choose next action (a/attack(20), b/block(15)): ", 0, (ConsoleColor)7);
                     }
                     while (true)
                     {
@@ -85,7 +117,7 @@ namespace ConsoleApp1
                         }
                         else
                         {
-                            Printer("Unknown command", 1, (ConsoleColor)7);
+                            Print("Unknown command", 1, (ConsoleColor)7);
                         }
                     }
                 default:
@@ -93,14 +125,7 @@ namespace ConsoleApp1
                     return input;
             }
         }
-        void Spaces(int indent)
-        {
-            for (int j = 0; j < World.width - (World.horizontal * 2) - (indent + 4); j++)
-            {
-                Console.Write(" ");
-            }
-        }
-        void Printer(string output, int enter, ConsoleColor color)
+        void Print(string output, int enter, ConsoleColor color)
         {
             Console.ForegroundColor = color;
             if (enter == 1)
@@ -146,21 +171,21 @@ namespace ConsoleApp1
                         Console.Write("HP: " + Player.HP + "/" + Player.MHP);
                         Console.ResetColor();
                         int indent = ("HP: " + Player.HP + "/" + Player.MHP).Length;
-                        Spaces(indent);
+                        Console.Write(new string(' ', World.width - (World.horizontal * 2) - (indent + 4)));
                         break;
                     case 1:
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.ForegroundColor = (ConsoleColor)11;
                         Console.Write("AP: " + Player.AP + "/" + Player.MAP);
                         Console.ResetColor();
                         indent = ("AP: " + Player.AP + "/" + Player.MAP).Length;
-                        Spaces(indent);
+                        Console.Write(new string(' ', World.width - (World.horizontal * 2) - (indent + 4)));
                         break;
                     case 2:
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write("Gold: " + Player.gold);
                         Console.ResetColor();
                         indent = ("Gold: " + Player.gold).Length;
-                        Spaces(indent);
+                        Console.Write(new string(' ', World.width - (World.horizontal * 2) - (indent + 4)));
                         break;
                     case World.vertical - 1:
                         if (State == 2)
@@ -169,18 +194,15 @@ namespace ConsoleApp1
                             Console.Write("It's HP: " + Convert.ToString(World.Grid[Player.Y, Player.X].ehp) + "/" + Convert.ToString(World.Grid[Player.Y, Player.X].emhp));
                             Console.ResetColor();
                             indent = ("It's HP: " + Convert.ToString(World.Grid[Player.Y, Player.X].ehp) + "/" + Convert.ToString(World.Grid[Player.Y, Player.X].emhp)).Length;
-                            Spaces(indent);
+                            Console.Write(new string(' ', World.width - (World.horizontal * 2) - (indent + 4)));
                         }
                         else
                         {
-                            Spaces(0);
+                            Console.Write(new string(' ', World.width - (World.horizontal * 2) - 4));
                         }
                         break;
                     default:
-                        for (int l = 0; l < World.width - (World.horizontal * 2 + 4); l++)
-                        {
-                            Console.Write(" ");
-                        }
+                        Console.Write(new string(' ', World.width - (World.horizontal * 2) - 4));
                         break;
                 }
                 Console.ForegroundColor = ConsoleColor.Yellow;

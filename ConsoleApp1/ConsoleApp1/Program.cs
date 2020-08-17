@@ -15,13 +15,12 @@ namespace ConsoleApp1
         {
             Random random = new Random();
             World my_world = new World();
-            Player Player1 = new Player();
             Actions Actions = new Actions();
             Console.OutputEncoding = Encoding.UTF8;
             Console.SetBufferSize(111, 30);
             int lvl = 1;
             my_world.Mapgen(lvl);
-            Actions.HUD(Player1.State);
+            Actions.HUD((int)Player.CurState);
             while (lvl > 0)
             {
                 bool got_out = false;
@@ -30,7 +29,7 @@ namespace ConsoleApp1
                 {
                     Player.AP = Player.MAP;
                 }
-                switch (Actions.Inputer(Player1.State, Player.Y, Player.X))
+                switch (Actions.Inputer((int)Player.CurState, Player.Y, Player.X))
                 {
                     case 'd':
                         Player.Y += 1;
@@ -69,29 +68,47 @@ namespace ConsoleApp1
                         Actions.escapability = false;
                         if (random.Next(1, 101) <= 30)
                         {
-                            Player1.State = -1;
+                            Player.CurState = States.Traveling;
                             Actions.entered = true;
                             got_out = true;
                         }
                         break;
                     case 'l':
-                        Player1.State = -1;
+                        Player.CurState = States.Traveling;
                         got_out = true;
                         break;
+                    case '1':
+                        World.Grid[Player.Y, Player.X].asortment.RemoveAt(0);
+                        World.Grid[Player.Y, Player.X].asortment.Reverse();
+                        World.Grid[Player.Y, Player.X].asortment.Add("Sold out");
+                        World.Grid[Player.Y, Player.X].asortment.Reverse();
+                        break;
+                    case '2':
+                        World.Grid[Player.Y, Player.X].asortment.RemoveAt(1);
+                        World.Grid[Player.Y, Player.X].asortment.Reverse();
+                        World.Grid[Player.Y, Player.X].asortment.Add("Sold out");
+                        World.Grid[Player.Y, Player.X].asortment.Reverse();
+                        break;
+                    case '3':
+                        World.Grid[Player.Y, Player.X].asortment.RemoveAt(2);
+                        World.Grid[Player.Y, Player.X].asortment.Reverse();
+                        World.Grid[Player.Y, Player.X].asortment.Add("Sold out");
+                        World.Grid[Player.Y, Player.X].asortment.Reverse();
+                        break;
                 }
-                if (Player1.State == -1 & !got_out) 
+                if (Player.CurState == States.Traveling & !got_out) 
                 {
-                    Player1.State = my_world.NewState(Player.Y, Player.X);
+                    Player.CurState = (States)my_world.NewState(Player.Y, Player.X);
                     Player.AP = Player.MAP;
                     Actions.escapability = true;
                 }
-                if (World.Grid[Player.Y, Player.X].ehp <= 0 & Player1.State == 2)
+                if (World.Grid[Player.Y, Player.X].ehp <= 0 & Player.CurState == States.Battle)
                 {
-                    Player1.State = -1; //traveling
+                    Player.CurState = States.Traveling;
                     Actions.entered = true;
                     Player.gold += random.Next(10, 26);
                 }
-                Actions.HUD(Player1.State);
+                Actions.HUD((int)Player.CurState);
             }
         }
     }
